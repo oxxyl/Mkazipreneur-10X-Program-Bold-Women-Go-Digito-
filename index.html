@@ -60,26 +60,37 @@ header{
 
 /* ---------- TABS ---------- */
 nav.tabs{
-  max-width:1320px;margin:0 auto;padding:0 18px;
-  display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;
+  max-width:1320px;margin:0 auto;padding:9px 18px 13px;
+  display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;
 }
 nav.tabs::-webkit-scrollbar{display:none}
 .tab{
-  appearance:none;border:0;background:transparent;cursor:pointer;white-space:nowrap;
+  appearance:none;cursor:pointer;white-space:nowrap;
   font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:.9rem;
-  color:var(--text-dim);padding:13px 18px;position:relative;transition:color .2s;
-  display:flex;align-items:center;gap:9px;
+  color:var(--text-dim);padding:8px 16px 8px 8px;position:relative;
+  display:flex;align-items:center;gap:10px;border-radius:12px;
+  background:rgba(255,255,255,.018);border:1px solid var(--border);
+  transition:color .2s, background .25s, border-color .25s, transform .2s, box-shadow .25s;
 }
-.tab .tnum{font-family:'JetBrains Mono';font-size:.72rem;opacity:.6;
-  border:1px solid var(--border-2);border-radius:5px;padding:1px 5px}
-.tab:hover{color:var(--text)}
-.tab.active{color:#fff}
-.tab.active::after{
-  content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:2.5px;
-  background:linear-gradient(90deg,var(--cyan),var(--teal));border-radius:3px;
+.tab .tnum{
+  font-family:'JetBrains Mono';font-size:.72rem;font-weight:700;
+  width:25px;height:25px;display:grid;place-items:center;border-radius:8px;
+  background:rgba(79,195,212,.08);border:1px solid var(--border-2);color:var(--text-dim);
+  transition:all .25s;
+}
+.tab:hover{color:var(--text);background:rgba(79,195,212,.06);border-color:var(--border-2);transform:translateY(-1px)}
+.tab:hover .tnum{color:var(--cyan)}
+.tab.active{
+  color:#fff;
+  background:linear-gradient(135deg,rgba(79,195,212,.20),rgba(34,161,142,.10));
+  border-color:rgba(79,195,212,.55);
+  box-shadow:0 6px 22px rgba(79,195,212,.16), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.tab.active .tnum{
+  background:linear-gradient(135deg,var(--cyan),var(--teal));
+  border-color:transparent;color:#03101e;
   box-shadow:0 0 14px var(--glow);
 }
-.tab.active .tnum{border-color:var(--cyan);color:var(--cyan);opacity:1}
 
 /* ---------- LAYOUT ---------- */
 main{max-width:1320px;margin:0 auto;padding:30px 26px 80px}
@@ -204,7 +215,7 @@ table.dt tr.total td{font-weight:700;color:#fff;border-top:2px solid var(--borde
       <div class="brand-txt">
         <b>10X PROGRAM</b>
         <span>Bold Women Go Digito</span>
-        <small>M&amp;E Command Center · Mkazipreneur Social Enterprise Ltd.</small>
+        <small>Program Data Summary · Mkazipreneur Social Enterprise Ltd.</small>
       </div>
     </div>
     <div class="partners">
@@ -230,7 +241,7 @@ table.dt tr.total td{font-weight:700;color:#fff;border-top:2px solid var(--borde
   <div class="view-head">
     <div class="eyebrow"><span class="dot"></span>Program Snapshot · June 2026</div>
     <h1 class="disp">Bold Women Go Digito</h1>
-    <p>A Mastercard Foundation–funded initiative delivered by Mkazipreneur with Outbox Uganda and UNCDF — building the digital and financial capability of young women entrepreneurs across Kampala, Wakiso, Mukono and Buikwe. This command center tracks the journey from expression of interest through enrollment, work assessment, needs diligence and MSME selection.</p>
+    <p>A Mastercard Foundation–funded initiative delivered by Mkazipreneur with Outbox Uganda and UNCDF — building the digital and financial capability of young women entrepreneurs across Kampala, Wakiso, Mukono and Buikwe. This data summary dashboard tracks the journey from course enrollment, Youth in Work assessment, Expression of Interest, needs assessment and MSME selection and Acceleration.</p>
   </div>
 
   <div class="grid g4">
@@ -452,7 +463,7 @@ table.dt tr.total td{font-weight:700;color:#fff;border-top:2px solid var(--borde
   <div class="view-head">
     <div class="eyebrow"><span class="dot"></span>Dataset 03 · Expression of Interest</div>
     <h1 class="disp">Expression of Interest (EOI)</h1>
-    <p>1,161 individuals expressed interest in the program. The pool is overwhelmingly young women solopreneurs, with inclusion targets for PWDs and refugees met at the application stage.</p>
+    <p>1,161 enrolled entrepreneurs (or those affiliated to them) completed the EOI assessment to participate in the next phase of the program. The pool is overwhelmingly young women solopreneurs, with inclusion targets for PWDs and refugees met at the application stage.</p>
   </div>
 
   <div class="grid g4">
