@@ -714,7 +714,7 @@ function runCounters(scope){
 /* ============ DATA ============ */
 const D={
  ov:{
-   funnel:[['EOI Applicants',1161],['Foundation Enrolled',3160],['YIW Assessed',2513],['Needs Assessed',563],['MSMEs Selected',500]],
+   funnel:[['Foundation Course',3160,'enrolled in the foundation course'],['EOI Assessment',1161,'completed the EOI assessment'],['YIW Assessment',2513,'assessed for work outcomes'],['Needs Assessment / Due Diligence',563,'assessed &amp; vetted for selection'],['MSME Selection',500,'selected for acceleration']],
    enrollMonths:['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'],
    enrollMonthly:[0,634,872,582,342,449,94,26,176,0],
    enrollCum:[0,634,1506,2088,2430,2879,2973,2999,3160,3160],
@@ -806,13 +806,13 @@ function build(v){
 
 function bOverview(){
   // funnel
-  const fEl=document.getElementById('funnel'), max=D.ov.funnel[1][1];
-  D.ov.funnel.forEach(([name,val],i)=>{
+  const fEl=document.getElementById('funnel'), max=Math.max(...D.ov.funnel.map(f=>f[1]));
+  D.ov.funnel.forEach(([name,val,cap],i)=>{
     const w=Math.max(18,Math.round(val/max*100));
     const d=document.createElement('div');d.className='fstep';
     d.innerHTML=`<div class="fbar" style="width:0%"></div>
       <div class="fl"><span class="fn">${String(i).padStart(2,'0')}</span>
-      <div class="ft"><b>${name}</b><small>${i===0?'expressed interest':i===4?'selected for acceleration':'reached this stage'}</small></div></div>
+      <div class="ft"><b>${name}</b><small>${cap}</small></div></div>
       <div class="fv">${k(val)}</div>`;
     fEl.appendChild(d);
     setTimeout(()=>d.querySelector('.fbar').style.width=w+'%',120+i*120);
