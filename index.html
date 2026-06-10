@@ -204,6 +204,33 @@ table.dt tr.total td{font-weight:700;color:#fff;border-top:2px solid var(--borde
 .sec-label{font-family:'JetBrains Mono';font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;
   color:var(--text-mute);margin:30px 0 14px;display:flex;align-items:center;gap:12px}
 .sec-label::after{content:"";flex:1;height:1px;background:var(--border)}
+
+/* ---------- MOTION LAYER ---------- */
+body.anim .card,body.anim .persona,body.anim .note{opacity:0}
+body.anim .in{animation:rise .65s cubic-bezier(.22,1,.36,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(20px) scale(.985)}to{opacity:1;transform:none}}
+.tab.active{background-size:220% 220%;animation:tabsheen 5.5s ease-in-out infinite}
+@keyframes tabsheen{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.kpi .val.pop{animation:kpipop .6s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes kpipop{from{transform:scale(.88)}to{transform:scale(1)}}
+body.anim .fstep{opacity:0;transform:translateX(-16px);transition:opacity .5s ease,transform .55s cubic-bezier(.22,1,.36,1)}
+body.anim .fstep.fin{opacity:1;transform:none}
+
+/* acceleration journey funnel */
+.afunnel{display:flex;flex-direction:column;gap:7px;margin-top:8px}
+.astep{margin:0 auto;width:100%;border-radius:10px;padding:13px 20px;display:flex;align-items:center;gap:18px;
+  box-shadow:0 6px 18px rgba(0,0,0,.28);opacity:0;transform:translateY(12px);
+  transition:opacity .5s ease,transform .55s cubic-bezier(.22,1,.36,1),width .75s cubic-bezier(.22,1,.36,1)}
+.astep.go{opacity:1;transform:none}
+.astep b{font-family:'Bricolage Grotesque';font-size:1.55rem;font-weight:800;min-width:86px;letter-spacing:-.01em;color:#fff}
+.astep span{font-size:.84rem;color:rgba(235,243,252,.88);line-height:1.35}
+.adrop{display:flex;justify-content:center;align-items:center;font-family:'JetBrains Mono';
+  font-size:.65rem;color:var(--text-mute);letter-spacing:.08em}
+@media(max-width:620px){.astep{width:100%!important}.astep b{font-size:1.2rem;min-width:64px}}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  body.anim .card,body.anim .persona,body.anim .note,body.anim .fstep{opacity:1;transform:none}
+}
 </style>
 </head>
 <body>
@@ -553,11 +580,16 @@ table.dt tr.total td{font-weight:700;color:#fff;border-top:2px solid var(--borde
     <p>563 entrepreneurs went through detailed needs assessment and due diligence; 500 MSMEs were selected for the acceleration phase, with 96% attending the opening business clinics.</p>
   </div>
 
-  <div class="grid g4">
-    <div class="card kpi c-cyan"><span class="label">Entrepreneurs Assessed</span><span class="val" data-count="563">0</span><span class="meta">needs assessment + due diligence</span></div>
-    <div class="card kpi c-gold"><span class="label">MSMEs Selected</span><span class="val" data-count="500">0</span><span class="meta">due diligence completed</span></div>
-    <div class="card kpi c-green"><span class="label">Clinic Attendance</span><span class="val" data-count="96" data-suf="%">0</span><span class="meta">481 of 500 · 10 clinics</span></div>
-    <div class="card kpi c-coral"><span class="label">Median Loan Needed</span><span class="val">2.5<span class="suf">M</span></span><span class="meta">UGX · aggregate demand 2.4B</span></div>
+  <div class="grid g3">
+    <div class="card span2">
+      <h3><span class="ic">▼</span>Journey to Acceleration</h3>
+      <div class="sub">From outreach to high-touch accelerator support</div>
+      <div class="afunnel" id="accFunnel"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card kpi c-green" style="flex:1"><span class="label">Clinic Attendance</span><span class="val" data-count="96" data-suf="%">0</span><span class="meta">481 of 500 · 10 clinics conducted</span></div>
+      <div class="card kpi c-coral" style="flex:1"><span class="label">Median Loan Needed</span><span class="val">2.5<span class="suf">M</span></span><span class="meta">UGX · aggregate demand 2.4B</span></div>
+    </div>
   </div>
 
   <div class="grid g3" style="margin-top:16px">
@@ -711,6 +743,81 @@ const yGrid={grid:GRID,border:{display:false}};
 function fmt(n){return n>=1000?(n/1000).toFixed(n%1000?1:0)+'K':n}
 function k(n){return new Intl.NumberFormat().format(n)}
 
+/* ---------- MOTION ENGINE ---------- */
+const RM=(typeof matchMedia==='function')&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+const IOK=(typeof IntersectionObserver==='function');
+const ANIM=!RM&&IOK;
+if(ANIM)document.body.classList.add('anim');
+
+/* bar entrance presets: staggered pop with overshoot (pure bars) or smooth rise (mixed charts) */
+const POP={duration:850,easing:'easeOutBack',
+  delay:c=>c.type==='data'&&c.mode==='default'?c.dataIndex*70+(c.datasetIndex||0)*110:0};
+const RISE={duration:900,easing:'easeOutQuart',
+  delay:c=>c.type==='data'&&c.mode==='default'?c.dataIndex*60+(c.datasetIndex||0)*90:0};
+
+/* progressive trend-line reveal: clip line datasets left→right while they draw */
+const revealPlug={id:'lineReveal',
+  beforeDatasetDraw(ch,args){
+    const ds=ch.data.datasets[args.index];
+    if(ds._reveal===undefined||ds._reveal>=1)return;
+    const a=ch.chartArea,x=ch.ctx;
+    x.save();x.beginPath();
+    x.rect(a.left-6,a.top-6,(a.right-a.left+12)*ds._reveal,a.bottom-a.top+12);x.clip();
+    ds._clipped=1;
+  },
+  afterDatasetDraw(ch,args){
+    const ds=ch.data.datasets[args.index];
+    if(ds._clipped){ch.ctx.restore();ds._clipped=0;}
+  }};
+if(Chart.register)Chart.register(revealPlug);
+function startReveal(ch){
+  if(!ch||!ch.data||!ch.data.datasets)return;
+  const lines=ch.data.datasets.filter(d=>d&&d._reveal!==undefined);
+  if(!lines.length)return;
+  if(!ANIM){lines.forEach(d=>d._reveal=1);return;}
+  const t0=performance.now(),dur=1700;
+  (function f(t){
+    const p=Math.min((t-t0)/dur,1),e=1-Math.pow(1-p,3);
+    lines.forEach(d=>d._reveal=e);
+    if(ch.draw)ch.draw();
+    if(p<1)requestAnimationFrame(f);
+  })(t0);
+}
+
+/* viewport-deferred chart creation + replay: charts animate every time they enter view after a tab switch */
+const chartQ=new Map();
+function replayChart(c){
+  (c.data.datasets||[]).forEach(d=>{if(d._reveal!==undefined)d._reveal=0;});
+  if(c.reset)c.reset();
+  if(c.update)c.update();
+  startReveal(c);
+}
+const chartIO=ANIM?new IntersectionObserver(es=>{
+  es.forEach(e=>{
+    if(!e.isIntersecting)return;
+    chartIO.unobserve(e.target);
+    const mk=chartQ.get(e.target);
+    if(mk){chartQ.delete(e.target);const c=mk(e.target);e.target._chart=c;startReveal(c);}
+    else if(e.target._chart){replayChart(e.target._chart);}
+  });
+},{threshold:.22}):null;
+function defer(id,make){
+  const el=document.getElementById(id);
+  if(!chartIO){const c=make(el);el._chart=c;startReveal(c);return;}
+  chartQ.set(el,make);chartIO.observe(el);
+}
+
+/* scroll-reveal: cards, personas & notes rise in with a slight stagger */
+let rIO=null;
+if(ANIM){
+  rIO=new IntersectionObserver(es=>{
+    es.forEach(e=>{if(e.isIntersecting){rIO.unobserve(e.target);e.target.classList.add('in');}});
+  },{threshold:.1});
+  document.querySelectorAll('.card,.persona,.note').forEach((el,i)=>{
+    el.style.animationDelay=((i%4)*70)+'ms';rIO.observe(el);
+  });
+}
+
 /* ---------- TAB SWITCHING ---------- */
 const built={};
 document.getElementById('tabs').addEventListener('click',e=>{
@@ -719,21 +826,45 @@ document.getElementById('tabs').addEventListener('click',e=>{
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===b));
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id===v));
   window.scrollTo({top:0,behavior:'smooth'});
-  build(v);
+  if(built[v])replay(v);else build(v);
 });
 
-/* ---------- COUNTERS ---------- */
-function runCounters(scope){
-  scope.querySelectorAll('[data-count]').forEach(el=>{
-    if(el.dataset.done)return; el.dataset.done=1;
-    const target=parseFloat(el.dataset.count), suf=el.dataset.suf||'', dec=target%1!==0?1:0;
-    const t0=performance.now(),dur=1100;
-    (function step(t){
-      const p=Math.min((t-t0)/dur,1), e=1-Math.pow(1-p,3), val=target*e;
-      el.innerHTML=(dec?val.toFixed(1):k(Math.round(val)))+(suf?`<span class="suf">${suf}</span>`:'');
-      if(p<1)requestAnimationFrame(step);
-    })(t0);
+/* replay all animations in a view: counters, card rises, charts & funnels */
+function replay(v){
+  if(!ANIM)return;
+  const sec=document.getElementById(v);
+  sec.querySelectorAll('[data-count]').forEach(el=>{
+    delete el.dataset.done;el.classList.remove('pop');void el.offsetWidth;cIO.observe(el);
   });
+  sec.querySelectorAll('.card,.persona,.note').forEach(el=>{
+    el.classList.remove('in');void el.offsetWidth;rIO.observe(el);
+  });
+  sec.querySelectorAll('canvas').forEach(cv=>{if(cv._chart)chartIO.observe(cv);});
+  if(v==='overview')renderJourneyFunnel();
+  if(v==='needs')renderAccFunnel();
+}
+
+/* ---------- COUNTERS (fire when scrolled into view) ---------- */
+function animateCount(el){
+  if(el.dataset.done)return; el.dataset.done=1;
+  const target=parseFloat(el.dataset.count), suf=el.dataset.suf||'', dec=target%1!==0?1:0;
+  el.classList.add('pop');
+  if(!ANIM){el.innerHTML=(dec?target.toFixed(1):k(target))+(suf?`<span class="suf">${suf}</span>`:'');return;}
+  const t0=performance.now(),dur=1100;
+  (function step(t){
+    const p=Math.min((t-t0)/dur,1), e=1-Math.pow(1-p,3), val=target*e;
+    el.innerHTML=(dec?val.toFixed(1):k(Math.round(val)))+(suf?`<span class="suf">${suf}</span>`:'');
+    if(p<1)requestAnimationFrame(step);
+  })(t0);
+}
+let cIO=null;
+if(ANIM){
+  cIO=new IntersectionObserver(es=>{
+    es.forEach(e=>{if(e.isIntersecting){cIO.unobserve(e.target);animateCount(e.target);}});
+  },{threshold:.5});
+  document.querySelectorAll('[data-count]').forEach(el=>cIO.observe(el));
+}else{
+  document.querySelectorAll('[data-count]').forEach(animateCount);
 }
 
 /* ============ DATA ============ */
@@ -779,6 +910,12 @@ const D={
    salary:{l:['Kampala','Wakiso','Mukono','Buikwe'],d:[351206,323038,308491,229438]}
  },
  n:{
+   accFunnel:[
+     [3160,'Enrolled onto the 10X program by completing the Foundation Course','#13294b',100],
+     [874,'Expressed interest (EOI) in the next phase — high-touch support','#1b4d7a',84],
+     [563,'Businesses assessed with due diligence completed','#2e6da4',70],
+     [500,'MSMEs selected for the accelerator','linear-gradient(90deg,#22a18e,#2ecc8f)',57]
+   ],
    dist:{l:['Kampala','Wakiso','Mukono','Buikwe'],d:[267,154,124,18]},
    persona:{l:['Sandra','Atim','Mary'],d:[45,38,17]},
    formal:{l:['Will register if benefits clear','Want to formalize now','Prefer to stay informal'],d:[281,102,30]},
@@ -798,40 +935,45 @@ const D={
 };
 
 /* ---------- chart helpers ---------- */
+const HOV={hoverBorderColor:'rgba(255,255,255,.55)',hoverBorderWidth:2};
 function barV(id,labels,data,colors,opts={}){
-  return new Chart(document.getElementById(id),{type:'bar',
-    data:{labels,datasets:[{data,backgroundColor:colors||C.cyan,borderRadius:6,maxBarThickness:opts.bt||54}]},
-    options:{maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{...noGrid,ticks:{font:{size:11}}},y:{...yGrid,beginAtZero:true,ticks:{callback:v=>fmt(v)}}},...opts.o}});
+  defer(id,el=>new Chart(el,{type:'bar',
+    data:{labels,datasets:[{data,backgroundColor:colors||C.cyan,borderRadius:6,maxBarThickness:opts.bt||54,...HOV}]},
+    options:{maintainAspectRatio:false,animation:POP,plugins:{legend:{display:false}},
+      scales:{x:{...noGrid,ticks:{font:{size:11}}},y:{...yGrid,beginAtZero:true,ticks:{callback:v=>fmt(v)}}},...opts.o}}));
 }
 function barH(id,labels,data,colors,opts={}){
-  return new Chart(document.getElementById(id),{type:'bar',
-    data:{labels,datasets:[{data,backgroundColor:colors||C.cyan,borderRadius:5,maxBarThickness:26}]},
-    options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{...yGrid,beginAtZero:true,ticks:{callback:v=>fmt(v)}},y:{...noGrid,ticks:{font:{size:11}}}},...opts.o}});
+  defer(id,el=>new Chart(el,{type:'bar',
+    data:{labels,datasets:[{data,backgroundColor:colors||C.cyan,borderRadius:5,maxBarThickness:26,...HOV}]},
+    options:{indexAxis:'y',maintainAspectRatio:false,animation:POP,plugins:{legend:{display:false}},
+      scales:{x:{...yGrid,beginAtZero:true,ticks:{callback:v=>fmt(v)}},y:{...noGrid,ticks:{font:{size:11}}}},...opts.o}}));
 }
 function doughnut(id,labels,data,colors){
-  return new Chart(document.getElementById(id),{type:'doughnut',
-    data:{labels,datasets:[{data,backgroundColor:colors||PAL,borderColor:'#08111f',borderWidth:2,hoverOffset:6}]},
-    options:{maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'right',labels:{font:{size:11}}}}}});
+  defer(id,el=>new Chart(el,{type:'doughnut',
+    data:{labels,datasets:[{data,backgroundColor:colors||PAL,borderColor:'#08111f',borderWidth:2,hoverOffset:8}]},
+    options:{maintainAspectRatio:false,cutout:'62%',
+      animation:{animateRotate:true,animateScale:true,duration:1050,easing:'easeOutQuart'},
+      plugins:{legend:{position:'right',labels:{font:{size:11}}}}}}));
 }
 function pie(id,labels,data,colors){
-  return new Chart(document.getElementById(id),{type:'doughnut',
-    data:{labels,datasets:[{data,backgroundColor:colors||PAL,borderColor:'#08111f',borderWidth:2,hoverOffset:6}]},
-    options:{maintainAspectRatio:false,cutout:'0%',plugins:{legend:{position:'right',labels:{font:{size:11}}}}}});
+  defer(id,el=>new Chart(el,{type:'doughnut',
+    data:{labels,datasets:[{data,backgroundColor:colors||PAL,borderColor:'#08111f',borderWidth:2,hoverOffset:8}]},
+    options:{maintainAspectRatio:false,cutout:'0%',
+      animation:{animateRotate:true,animateScale:true,duration:1050,easing:'easeOutQuart'},
+      plugins:{legend:{position:'right',labels:{font:{size:11}}}}}}));
 }
 
 /* ============ BUILDERS ============ */
 function build(v){
-  if(built[v]){runCounters(document.getElementById(v));return;}
+  if(built[v])return;
   built[v]=1;
-  runCounters(document.getElementById(v));
   ({overview:bOverview,foundation:bFoundation,yiw:bYiw,eoi:bEoi,needs:bNeeds}[v])();
 }
 
-function bOverview(){
-  // funnel
-  const fEl=document.getElementById('funnel'), max=Math.max(...D.ov.funnel.map(f=>f[1]));
+/* overview journey funnel — rebuildable so it replays on tab return */
+function renderJourneyFunnel(){
+  const fEl=document.getElementById('funnel');fEl.innerHTML='';
+  const max=Math.max(...D.ov.funnel.map(f=>f[1]));
   D.ov.funnel.forEach(([name,val,cap],i)=>{
     const w=Math.max(18,Math.round(val/max*100));
     const d=document.createElement('div');d.className='fstep';
@@ -840,35 +982,59 @@ function bOverview(){
       <div class="ft"><b>${name}</b><small>${cap}</small></div></div>
       <div class="fv">${k(val)}</div>`;
     fEl.appendChild(d);
-    setTimeout(()=>d.querySelector('.fbar').style.width=w+'%',120+i*120);
+    setTimeout(()=>{d.classList.add('fin');d.querySelector('.fbar').style.width=w+'%';},140+i*140);
   });
-  new Chart(ovEnroll,{type:'bar',
+}
+
+/* acceleration journey funnel — tapering steps with stage-retention chips */
+function renderAccFunnel(){
+  const el=document.getElementById('accFunnel');el.innerHTML='';
+  const steps=D.n.accFunnel;
+  steps.forEach((s,i)=>{
+    if(i>0){
+      const drop=document.createElement('div');drop.className='adrop';
+      drop.textContent='▼ '+Math.round(s[0]/steps[i-1][0]*100)+'% of previous stage';
+      el.appendChild(drop);
+    }
+    const d=document.createElement('div');d.className='astep';
+    d.style.background=s[2];
+    d.style.width=ANIM?'34%':s[3]+'%';
+    d.innerHTML=`<b>${k(s[0])}</b><span>${s[1]}</span>`;
+    el.appendChild(d);
+    if(ANIM)setTimeout(()=>{d.classList.add('go');d.style.width=s[3]+'%';},170+i*180);
+    else d.classList.add('go');
+  });
+}
+
+function bOverview(){
+  renderJourneyFunnel();
+  defer('ovEnroll',el=>new Chart(el,{type:'bar',
     data:{labels:D.ov.enrollMonths,datasets:[
-      {type:'bar',label:'Monthly',data:D.ov.enrollMonthly,backgroundColor:C.navy,borderRadius:5,maxBarThickness:30,order:2},
-      {type:'line',label:'Cumulative',data:D.ov.enrollCum,borderColor:C.gold,backgroundColor:'rgba(224,177,60,.12)',fill:true,tension:.35,pointRadius:3,pointBackgroundColor:C.gold,borderWidth:2.5,order:1}
+      {type:'bar',label:'Monthly',data:D.ov.enrollMonthly,backgroundColor:C.navy,borderRadius:5,maxBarThickness:30,order:2,...HOV},
+      {type:'line',label:'Cumulative',data:D.ov.enrollCum,borderColor:C.gold,backgroundColor:'rgba(224,177,60,.12)',fill:true,tension:.35,pointRadius:3,pointBackgroundColor:C.gold,borderWidth:2.5,order:1,_reveal:0}
     ]},
-    options:{maintainAspectRatio:false,plugins:{legend:{position:'top'}},
-      scales:{x:{...noGrid},y:{...yGrid,beginAtZero:true,ticks:{callback:v=>fmt(v)}}}}});
-  new Chart(ovDistrict,{type:'bar',
+    options:{maintainAspectRatio:false,animation:RISE,plugins:{legend:{position:'top'}},
+      scales:{x:{...noGrid},y:{...yGrid,beginAtZero:true,ticks:{callback:v=>fmt(v)}}}}}));
+  defer('ovDistrict',el=>new Chart(el,{type:'bar',
     data:{labels:D.ov.dist,datasets:[
-      {label:'Foundation Enrolled',data:D.ov.distFound,backgroundColor:C.cyan,borderRadius:5},
-      {label:'YIW Assessed',data:D.ov.distYiw,backgroundColor:C.teal,borderRadius:5},
-      {label:'Assessed (Needs)',data:D.ov.distSel,backgroundColor:C.gold,borderRadius:5}
+      {label:'Foundation Enrolled',data:D.ov.distFound,backgroundColor:C.cyan,borderRadius:5,...HOV},
+      {label:'YIW Assessed',data:D.ov.distYiw,backgroundColor:C.teal,borderRadius:5,...HOV},
+      {label:'Assessed (Needs)',data:D.ov.distSel,backgroundColor:C.gold,borderRadius:5,...HOV}
     ]},
-    options:{maintainAspectRatio:false,plugins:{legend:{position:'top'}},
-      scales:{x:{...noGrid},y:{...yGrid,beginAtZero:true,ticks:{callback:v=>fmt(v)}}}}});
+    options:{maintainAspectRatio:false,animation:POP,plugins:{legend:{position:'top'}},
+      scales:{x:{...noGrid},y:{...yGrid,beginAtZero:true,ticks:{callback:v=>fmt(v)}}}}}));
   doughnut('ovGender',['Female','Male'],[90,10],[C.violet,C.slate]);
 }
 
 function bFoundation(){
   barV('fEnrollDist',D.f.enrollDist.l,D.f.enrollDist.d,[C.navy,C.gold,C.teal,C.coral]);
-  new Chart(fProgress,{type:'bar',
+  defer('fProgress',el=>new Chart(el,{type:'bar',
     data:{labels:D.ov.enrollMonths,datasets:[
-      {type:'bar',label:'Monthly',data:D.ov.enrollMonthly,backgroundColor:C.navy,borderRadius:5,maxBarThickness:28,order:2},
-      {type:'line',label:'Cumulative',data:D.ov.enrollCum,borderColor:C.gold,backgroundColor:'rgba(224,177,60,.1)',fill:true,tension:.35,pointRadius:3,borderWidth:2.5,order:1}
+      {type:'bar',label:'Monthly',data:D.ov.enrollMonthly,backgroundColor:C.navy,borderRadius:5,maxBarThickness:28,order:2,...HOV},
+      {type:'line',label:'Cumulative',data:D.ov.enrollCum,borderColor:C.gold,backgroundColor:'rgba(224,177,60,.1)',fill:true,tension:.35,pointRadius:3,borderWidth:2.5,order:1,_reveal:0}
     ]},
-    options:{maintainAspectRatio:false,plugins:{legend:{position:'top'}},
-      scales:{x:{...noGrid},y:{...yGrid,beginAtZero:true,ticks:{callback:v=>fmt(v)}}}}});
+    options:{maintainAspectRatio:false,animation:RISE,plugins:{legend:{position:'top'}},
+      scales:{x:{...noGrid},y:{...yGrid,beginAtZero:true,ticks:{callback:v=>fmt(v)}}}}}));
   barV('fAge',D.f.age.l,D.f.age.d,[C.navy,C.gold,C.teal,C.coral]);
   doughnut('fEdu',D.f.edu.l,D.f.edu.d,[C.navy,C.gold,C.teal,C.coral]);
   pie('fPersona',D.f.persona.l,D.f.persona.d,[C.cyan,C.indigo,C.gold]);
@@ -885,24 +1051,24 @@ function bFoundation(){
 }
 
 function bYiw(){
-  new Chart(yDist,{type:'bar',
+  defer('yDist',el=>new Chart(el,{type:'bar',
     data:{labels:D.y.dist.l,datasets:[
-      {label:'Assessed',data:D.y.dist.assessed,backgroundColor:C.cyan,borderRadius:5,yAxisID:'y'},
-      {type:'line',label:'Median income (UGX K)',data:D.y.dist.median,borderColor:C.gold,backgroundColor:C.gold,pointRadius:4,borderWidth:2.5,tension:.3,yAxisID:'y1'}
+      {label:'Assessed',data:D.y.dist.assessed,backgroundColor:C.cyan,borderRadius:5,yAxisID:'y',...HOV},
+      {type:'line',label:'Median income (UGX K)',data:D.y.dist.median,borderColor:C.gold,backgroundColor:C.gold,pointRadius:4,borderWidth:2.5,tension:.3,yAxisID:'y1',_reveal:0}
     ]},
-    options:{maintainAspectRatio:false,plugins:{legend:{position:'top'}},
+    options:{maintainAspectRatio:false,animation:RISE,plugins:{legend:{position:'top'}},
       scales:{x:{...noGrid},y:{...yGrid,beginAtZero:true,position:'left',ticks:{callback:v=>fmt(v)}},
-        y1:{position:'right',beginAtZero:true,grid:{display:false},border:{display:false},ticks:{callback:v=>v+'K'}}}}});
+        y1:{position:'right',beginAtZero:true,grid:{display:false},border:{display:false},ticks:{callback:v=>v+'K'}}}}}));
   barV('yIncome',D.y.income.l,D.y.income.d,C.cyan,{bt:48});
   pie('ySector',D.y.sector.l,D.y.sector.d,[C.navy,C.green,C.gold]);
-  new Chart(yImproved,{type:'bar',
+  defer('yImproved',el=>new Chart(el,{type:'bar',
     data:{labels:['Kampala','Mukono','Trade & Svc','Wakiso','Agriculture','Buikwe','Light Mfg'],
       datasets:[{label:'% improved',
         data:[51.6,57.2,56.0,63.8,65.7,60.1,81.7],
-        backgroundColor:['#1b4d7a','#1b4d7a',C.cyan,'#1b4d7a',C.teal,'#1b4d7a',C.green],borderRadius:5,maxBarThickness:30}]},
-    options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+        backgroundColor:['#1b4d7a','#1b4d7a',C.cyan,'#1b4d7a',C.teal,'#1b4d7a',C.green],borderRadius:5,maxBarThickness:30,...HOV}]},
+    options:{maintainAspectRatio:false,animation:POP,plugins:{legend:{display:false},
       tooltip:{callbacks:{label:c=>c.parsed.y+'% improved'}}},
-      scales:{x:{...noGrid,ticks:{font:{size:10}}},y:{...yGrid,beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}}});
+      scales:{x:{...noGrid,ticks:{font:{size:10}}},y:{...yGrid,beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}}}));
   barH('yOutcomes',D.y.outcomes.l,D.y.outcomes.d.map(v=>v),[C.green,C.cyan,C.gold,C.coral],{o:{scales:{x:{...yGrid,beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}},y:{...noGrid}}}});
   barH('ySkills',D.y.skills.l,D.y.skills.d,C.gold);
   let m='<thead><tr><th>District</th><th class="num">Assessed</th><th class="num">Median Income</th><th class="num">% Improved</th></tr></thead><tbody>';
@@ -913,21 +1079,21 @@ function bYiw(){
 
 function bEoi(){
   barV('eGeo',D.e.geo.l,D.e.geo.d,[C.navy,C.indigo,C.gold,C.green]);
-  new Chart(eGender,{type:'bar',
+  defer('eGender',el=>new Chart(el,{type:'bar',
     data:{labels:D.e.gender.l,datasets:[
-      {label:'Female',data:D.e.gender.f,backgroundColor:C.violet,borderRadius:5},
-      {label:'Male',data:D.e.gender.m,backgroundColor:C.slate,borderRadius:5}
+      {label:'Female',data:D.e.gender.f,backgroundColor:C.violet,borderRadius:5,...HOV},
+      {label:'Male',data:D.e.gender.m,backgroundColor:C.slate,borderRadius:5,...HOV}
     ]},
-    options:{maintainAspectRatio:false,plugins:{legend:{position:'top'}},
-      scales:{x:{...noGrid,stacked:true},y:{...yGrid,stacked:true,beginAtZero:true}}}});
+    options:{maintainAspectRatio:false,animation:RISE,plugins:{legend:{position:'top'}},
+      scales:{x:{...noGrid,stacked:true},y:{...yGrid,stacked:true,beginAtZero:true}}}}));
   barV('eAge',D.e.age.l,D.e.age.d,C.cyan,{bt:34,o:{scales:{x:{...noGrid,ticks:{font:{size:10}}},y:{...yGrid,beginAtZero:true}}}});
-  new Chart(eIncl,{type:'bar',
+  defer('eIncl',el=>new Chart(el,{type:'bar',
     data:{labels:D.e.incl.l,datasets:[
-      {label:'PWD',data:D.e.incl.pwd,backgroundColor:C.gold,borderRadius:5},
-      {label:'Refugee',data:D.e.incl.ref,backgroundColor:C.navy,borderRadius:5}
+      {label:'PWD',data:D.e.incl.pwd,backgroundColor:C.gold,borderRadius:5,...HOV},
+      {label:'Refugee',data:D.e.incl.ref,backgroundColor:C.navy,borderRadius:5,...HOV}
     ]},
-    options:{maintainAspectRatio:false,plugins:{legend:{position:'top'}},
-      scales:{x:{...noGrid},y:{...yGrid,beginAtZero:true}}}});
+    options:{maintainAspectRatio:false,animation:POP,plugins:{legend:{position:'top'}},
+      scales:{x:{...noGrid},y:{...yGrid,beginAtZero:true}}}}));
   barH('eFounder',D.e.founder.l,D.e.founder.d,[C.cyan,C.teal,C.indigo,C.gold,C.coral]);
   barV('eRole',D.e.role.l,D.e.role.d,[C.gold,C.navy,C.green,C.indigo,C.coral],{o:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'UGX '+k(c.parsed.y*1000)}}},scales:{x:{...noGrid,ticks:{font:{size:10}}},y:{...yGrid,beginAtZero:true,ticks:{callback:v=>v+'K'}}}}});
   barV('eIncome',D.e.income.l,D.e.income.d,C.cyan);
@@ -935,19 +1101,20 @@ function bEoi(){
 }
 
 function bNeeds(){
+  renderAccFunnel();
   barH('nDist',D.n.dist.l,D.n.dist.d,[C.navy,C.indigo,C.gold,C.green]);
   pie('nPersona',D.n.persona.l,D.n.persona.d,[C.navy,C.indigo,C.gold]);
   barH('nFormal',D.n.formal.l,D.n.formal.d,[C.gold,C.teal,C.slate]);
-  new Chart(nStability,{type:'bar',
-    data:{labels:D.n.freq.l,datasets:[{label:'Income frequency',data:D.n.freq.d,backgroundColor:[C.cyan,C.teal,C.gold,C.coral],borderRadius:6,maxBarThickness:48}]},
-    options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+  defer('nStability',el=>new Chart(el,{type:'bar',
+    data:{labels:D.n.freq.l,datasets:[{label:'Income frequency',data:D.n.freq.d,backgroundColor:[C.cyan,C.teal,C.gold,C.coral],borderRadius:6,maxBarThickness:48,...HOV}]},
+    options:{maintainAspectRatio:false,animation:POP,plugins:{legend:{display:false},
       subtitle:{display:true,text:'78% sometimes high/low · 13% stable · 9% very unpredictable',color:'#8198b4',font:{size:11},padding:{bottom:8}}},
-      scales:{x:{...noGrid},y:{...yGrid,beginAtZero:true}}}});
+      scales:{x:{...noGrid},y:{...yGrid,beginAtZero:true}}}}));
   barH('nFinance',D.n.finance.l,D.n.finance.d,C.cyan);
   barH('nLoan',D.n.loan.l,D.n.loan.d,[C.coral,C.cyan,C.teal,C.indigo,C.gold,C.green]);
-  new Chart(nDevice,{type:'bar',
-    data:{labels:D.n.device.l,datasets:[{data:D.n.device.d,backgroundColor:[C.cyan,C.indigo,C.teal,C.gold,C.coral],borderRadius:6,maxBarThickness:46}]},
-    options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{...noGrid,ticks:{font:{size:10}}},y:{...yGrid,beginAtZero:true}}}});
+  defer('nDevice',el=>new Chart(el,{type:'bar',
+    data:{labels:D.n.device.l,datasets:[{data:D.n.device.d,backgroundColor:[C.cyan,C.indigo,C.teal,C.gold,C.coral],borderRadius:6,maxBarThickness:46,...HOV}]},
+    options:{maintainAspectRatio:false,animation:POP,plugins:{legend:{display:false}},scales:{x:{...noGrid,ticks:{font:{size:10}}},y:{...yGrid,beginAtZero:true}}}}));
   barH('nAdopt',D.n.adopt.l,D.n.adopt.d,[C.teal,C.cyan,C.coral]);
   barH('nReach',D.n.reach.l,D.n.reach.d,C.navy);
   barH('nChallenge',D.n.challenge.l,D.n.challenge.d,[C.coral,C.gold,C.indigo,C.teal,C.cyan,C.green]);
