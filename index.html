@@ -227,6 +227,29 @@ body.anim .fstep.fin{opacity:1;transform:none}
 .adrop{display:flex;justify-content:center;align-items:center;font-family:'JetBrains Mono';
   font-size:.65rem;color:var(--text-mute);letter-spacing:.08em}
 @media(max-width:620px){.astep{width:100%!important}.astep b{font-size:1.2rem;min-width:64px}}
+
+/* founders venn diagram */
+.vennwrap{display:flex;gap:22px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.vennsvg{flex:1 1 300px;min-width:270px;max-width:480px;height:auto}
+.vennsvg .vh{font-family:'JetBrains Mono';font-size:13px;letter-spacing:.1em;font-weight:700}
+.vennsvg .vn{font-family:'Bricolage Grotesque';font-size:36px;font-weight:800}
+.vennsvg .vl{font-size:12px;fill:#8198b4}
+.vennsvg .vi{font-style:italic;font-size:11px;fill:#5c7596}
+.vc{transform-origin:center;transform-box:fill-box}
+body.anim .vc{animation:vcin .9s cubic-bezier(.22,1,.36,1) both}
+body.anim .vc2{animation-delay:.18s}
+@keyframes vcin{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:scale(1)}}
+body.anim .vt1,body.anim .vt2,body.anim .vt3{opacity:0;animation:vfade .6s ease forwards}
+body.anim .vt1{animation-delay:.5s}body.anim .vt2{animation-delay:.68s}body.anim .vt3{animation-delay:.86s}
+@keyframes vfade{to{opacity:1}}
+.vlist{flex:1 1 230px;display:flex;flex-direction:column;gap:8px;min-width:220px}
+.vrow{display:flex;gap:12px;align-items:center;padding:8px 12px;border-radius:9px;
+  background:rgba(255,255,255,.02);border:1px solid var(--border);border-left:3px solid var(--cyan)}
+body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
+.vrow b{font-family:'Bricolage Grotesque';font-size:1.22rem;font-weight:800;min-width:52px;letter-spacing:-.01em}
+.vrow .vt{font-size:.74rem;color:var(--text-dim);line-height:1.3}
+.vrow .vt strong{display:block;color:var(--text);font-size:.8rem}
+.vfoot{font-family:'JetBrains Mono';font-size:.68rem;color:var(--text-mute);margin-top:12px;letter-spacing:.04em}
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   body.anim .card,body.anim .persona,body.anim .note,body.anim .fstep{opacity:1;transform:none}
@@ -547,11 +570,12 @@ body.anim .fstep.fin{opacity:1;transform:none}
     </div>
   </div>
 
-  <div class="grid g2" style="margin-top:16px">
-    <div class="card">
-      <h3><span class="ic">⚒</span>Founder &amp; Employment Status</h3>
-      <div class="sub">Solopreneurs dominate · founder–employee overlap 58.7%</div>
-      <div class="chart-wrap h300"><canvas id="eFounder"></canvas></div>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="card span2">
+      <h3><span class="ic">⚒</span>Founders &amp; Employment Status of Applicants</h3>
+      <div class="sub">Most founders also classify as full-time employees — solopreneurs running their own businesses full-time</div>
+      <div class="vennwrap" id="eVenn"></div>
+      <p class="vfoot">N = 1,161 applicant records · founder–employee overlap = 682 respondents (58.7%)</p>
     </div>
     <div class="card">
       <h3><span class="ic">₴</span>Income by Role</h3>
@@ -846,6 +870,7 @@ function replay(v){
   sec.querySelectorAll('canvas').forEach(cv=>{if(cv._chart)chartIO.observe(cv);});
   if(v==='overview')renderJourneyFunnel();
   if(v==='needs')renderAccFunnel();
+  if(v==='eoi')renderVenn();
 }
 
 /* ---------- COUNTERS (fire when scrolled into view) ---------- */
@@ -908,7 +933,10 @@ const D={
    gender:{l:['Kampala','Wakiso','Mukono','Buikwe'],f:[458,294,217,76],m:[66,22,15,13]},
    age:{l:['16-18','19-21','22-24','25-27','28-30','31-33','34-36','37-39','40-44','45-49','50+'],d:[29,114,208,204,218,183,127,20,13,16,29]},
    incl:{l:['Kampala','Wakiso','Mukono','Buikwe'],ref:[20,13,8,5],pwd:[20,14,19,5]},
-   founder:{l:['Founder + Full-time','Founder Only','Full-time Employee','Part-time Employee','Founder + Part-time'],d:[668,256,153,70,14]},
+   venn:{founders:938,employees:905,fOnly:256,both:682,eOnly:223},
+   founder:{l:['Founder + Full-time','Founder Only','Full-time Employee Only','Part-time Employee Only','Founder + Part-time'],d:[668,256,153,70,14],
+     colors:['#4fc3d4','#e0b13c','#6c8cff','#e8c56a','#2ecc8f'],
+     desc:['Solopreneurs: founders who work full-time in their business','Business owners not indicated as employees','Employees in businesses owned by others','Part-time workers in female-led enterprises','Founders with part-time roles']},
    role:{l:['Founder Only','Solopreneur (F+FT)','Founder+Part-time','Employee (FT)','Employee (PT)'],d:[300,290,200,120,100]},
    income:{l:['Below 100K','100–250K','250–500K','500K–1M','Above 1M'],d:[308,301,477,49,26]},
    salary:{l:['Kampala','Wakiso','Mukono','Buikwe'],d:[351206,323038,308491,229438]}
@@ -1010,6 +1038,34 @@ function renderAccFunnel(){
   });
 }
 
+/* founders & employment venn — rebuilt on each EOI tab visit so it replays */
+function renderVenn(){
+  const w=document.getElementById('eVenn');
+  const v=D.e.venn, bd=D.e.founder;
+  w.innerHTML=`<svg class="vennsvg" viewBox="0 0 470 318" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Venn diagram of founders and employees">
+    <text x="130" y="24" text-anchor="middle" class="vh" fill="#7fb3e8">FOUNDERS (${v.founders})</text>
+    <text x="340" y="24" text-anchor="middle" class="vh" fill="#e0b13c">EMPLOYEES (${v.employees})</text>
+    <circle class="vc vc1" cx="172" cy="178" r="124" fill="rgba(46,109,164,.16)" stroke="#2e6da4" stroke-width="2.5"/>
+    <circle class="vc vc2" cx="298" cy="178" r="124" fill="rgba(224,177,60,.10)" stroke="#e0b13c" stroke-width="2.5"/>
+    <g class="vt1">
+      <text x="108" y="174" text-anchor="middle" class="vn" fill="#dce6f4">${v.fOnly}</text>
+      <text x="108" y="198" text-anchor="middle" class="vl">Founder Only</text>
+    </g>
+    <g class="vt2">
+      <text x="235" y="168" text-anchor="middle" class="vn" fill="#ffffff">${v.both}</text>
+      <text x="235" y="192" text-anchor="middle" class="vl">Founder + Employee</text>
+      <text x="235" y="209" text-anchor="middle" class="vl vi">(Solopreneurs)</text>
+    </g>
+    <g class="vt3">
+      <text x="362" y="174" text-anchor="middle" class="vn" fill="#e8c56a">${v.eOnly}</text>
+      <text x="362" y="198" text-anchor="middle" class="vl">Employee Only</text>
+    </g>
+  </svg>
+  <div class="vlist">`+bd.l.map((lab,i)=>
+    `<div class="vrow" style="border-left-color:${bd.colors[i]};animation-delay:${(.45+i*.13).toFixed(2)}s"><b>${k(bd.d[i])}</b><div class="vt"><strong>${lab}</strong>${bd.desc[i]}</div></div>`
+  ).join('')+`</div>`;
+}
+
 function bOverview(){
   renderJourneyFunnel();
   defer('ovEnroll',el=>new Chart(el,{type:'bar',
@@ -1098,7 +1154,7 @@ function bEoi(){
     ]},
     options:{maintainAspectRatio:false,animation:POP,plugins:{legend:{position:'top'}},
       scales:{x:{...noGrid},y:{...yGrid,beginAtZero:true}}}}));
-  barH('eFounder',D.e.founder.l,D.e.founder.d,[C.cyan,C.teal,C.indigo,C.gold,C.coral]);
+  renderVenn();
   barV('eRole',D.e.role.l,D.e.role.d,[C.gold,C.navy,C.green,C.indigo,C.coral],{o:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'UGX '+k(c.parsed.y*1000)}}},scales:{x:{...noGrid,ticks:{font:{size:10}}},y:{...yGrid,beginAtZero:true,ticks:{callback:v=>v+'K'}}}}});
   barV('eIncome',D.e.income.l,D.e.income.d,C.cyan);
   barH('eSalary',D.e.salary.l,D.e.salary.d,[C.navy,C.teal,C.gold,C.coral],{o:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'UGX '+k(c.parsed.x)}}},scales:{x:{...yGrid,beginAtZero:true,ticks:{callback:v=>fmt(v)}},y:{...noGrid}}}});
