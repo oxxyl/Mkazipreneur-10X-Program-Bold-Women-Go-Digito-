@@ -316,7 +316,7 @@ body.anim .fstep.fin{opacity:1;transform:none}
       <h3><span class="ic">⚥</span>Gender (EOI)</h3>
       <div class="sub">Primary target: young women</div>
       <div class="chart-wrap h220"><canvas id="ovGender"></canvas></div>
-      <div class="note teal" style="margin-top:14px"><span class="ic">♀</span><div><b>90% female</b> (1,045). The 10% male are employers &amp; employees linked to women-led enterprises — present by design.</div></div>
+      <div class="note teal" style="margin-top:14px"><span class="ic">♀</span><div><b>90% female</b> (1,045 of 1,161 applicant records). The 10% male are founders, employers &amp; employees linked to women-led enterprises — present by design.</div></div>
     </div>
   </div>
 
@@ -507,20 +507,24 @@ body.anim .fstep.fin{opacity:1;transform:none}
   <div class="view-head">
     <div class="eyebrow"><span class="dot"></span>Dataset 03 · Expression of Interest</div>
     <h1 class="disp">Expression of Interest (EOI)</h1>
-    <p>1,161 enrolled entrepreneurs (or those affiliated to them) completed the EOI assessment to participate in the next phase of the program. The pool is overwhelmingly young women solopreneurs, with inclusion targets for PWDs and refugees met at the application stage.</p>
+    <p><b style="color:var(--text)">874 unique MSMEs</b> completed the EOI assessment to participate in the next phase (high-touch support) of the program. By design, applicants could also submit details on behalf of their employers or colleagues — producing <b style="color:var(--text)">1,161 individual applicant records</b> in total. The pool is overwhelmingly young women solopreneurs, with inclusion targets for PWDs and refugees met at the application stage.</p>
   </div>
 
   <div class="grid g4">
-    <div class="card kpi c-cyan"><span class="label">Total Applicants</span><span class="val" data-count="1161">0</span><span class="meta">across 4 districts</span></div>
-    <div class="card kpi c-violet"><span class="label">Female</span><span class="val" data-count="90" data-suf="%">0</span><span class="meta">1,045 women</span></div>
+    <div class="card kpi c-cyan"><span class="label">MSMEs Enrolled (EOI)</span><span class="val" data-count="874">0</span><span class="meta">unique enterprises · from <b>1,161</b> applicant records*</span></div>
+    <div class="card kpi c-violet"><span class="label">Female</span><span class="val" data-count="90" data-suf="%">0</span><span class="meta">1,045 of all applicant records</span></div>
     <div class="card kpi c-gold"><span class="label">Youth (≤35)</span><span class="val" data-count="92" data-suf="%">0</span><span class="meta">mean age 28.6</span></div>
     <div class="card kpi c-teal"><span class="label">Inclusion (PWD / Refugee)</span><span class="val">5.0<span class="suf">% / 4.0%</span></span><span class="meta"><b>both targets met</b></span></div>
   </div>
+  <p style="font-size:.76rem;color:var(--text-mute);margin:10px 2px 0;display:flex;align-items:flex-start;gap:7px">
+    <span style="color:var(--gold);font-weight:700">*</span>
+    <span><b style="color:var(--text-dim)">874 vs 1,161:</b> the EOI tool was designed so applicants could submit details on behalf of their employers or colleagues. 874 is the count of unique MSMEs enrolled; the 1,161 applicant records additionally include affiliated individuals such as male founders and over-age founders. Charts on this tab analyze all 1,161 records.</span>
+  </p>
 
   <div class="grid g2" style="margin-top:16px">
     <div class="card">
       <h3><span class="ic">⌖</span>Geographic Distribution</h3>
-      <div class="sub">Kampala 45% of applicants</div>
+      <div class="sub">Kampala 45% of 1,161 applicant records</div>
       <div class="chart-wrap h300"><canvas id="eGeo"></canvas></div>
     </div>
     <div class="card">
@@ -870,7 +874,7 @@ if(ANIM){
 /* ============ DATA ============ */
 const D={
  ov:{
-   funnel:[['Foundation Course',3160,'enrolled in the foundation course'],['EOI Assessment',1161,'completed the EOI assessment'],['YIW Assessment',2513,'assessed for work outcomes'],['Needs Assessment / Due Diligence',563,'assessed &amp; vetted for selection'],['MSME Selection',500,'selected for acceleration']],
+   funnel:[['Foundation Course',3160,'enrolled in the foundation course'],['EOI Assessment',874,'unique MSMEs completed the EOI (1,161 applicant records)'],['YIW Assessment',2513,'assessed for work outcomes'],['Needs Assessment / Due Diligence',563,'assessed &amp; vetted for selection'],['MSME Selection',500,'selected for acceleration']],
    enrollMonths:['Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'],
    enrollMonthly:[0,634,872,582,342,449,94,26,176,0],
    enrollCum:[0,634,1506,2088,2430,2879,2973,2999,3160,3160],
