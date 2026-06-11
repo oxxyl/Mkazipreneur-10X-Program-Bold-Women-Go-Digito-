@@ -250,6 +250,20 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
 .vrow .vt{font-size:.74rem;color:var(--text-dim);line-height:1.3}
 .vrow .vt strong{display:block;color:var(--text);font-size:.8rem}
 .vfoot{font-family:'JetBrains Mono';font-size:.68rem;color:var(--text-mute);margin-top:12px;letter-spacing:.04em}
+
+/* executive view toggle */
+.execbtn{appearance:none;cursor:pointer;margin-left:auto;display:flex;align-items:center;gap:9px;
+  font-family:'Bricolage Grotesque',sans-serif;font-weight:600;font-size:.8rem;color:var(--text-dim);
+  padding:8px 14px;border-radius:12px;background:rgba(255,255,255,.018);border:1px solid var(--border);
+  white-space:nowrap;transition:all .25s}
+.execbtn:hover{color:var(--text);border-color:var(--border-2)}
+.execbtn .sw{width:27px;height:15px;border-radius:8px;background:rgba(120,160,210,.22);position:relative;transition:background .25s;flex:none}
+.execbtn .sw::after{content:"";position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;background:#8198b4;transition:all .25s}
+.execbtn.on{color:#0b1626;background:linear-gradient(135deg,var(--gold),#e8c56a);border-color:transparent;
+  box-shadow:0 6px 18px rgba(224,177,60,.25)}
+.execbtn.on .sw{background:rgba(11,22,38,.28)}
+.execbtn.on .sw::after{left:14px;background:#0b1626}
+body.exec [data-tier="detail"]{display:none!important}
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   body.anim .card,body.anim .persona,body.anim .note,body.anim .fstep{opacity:1;transform:none}
@@ -281,6 +295,7 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
     <button class="tab" data-v="yiw"><span class="tnum">02</span>Youth in Work</button>
     <button class="tab" data-v="eoi"><span class="tnum">03</span>Expression of Interest</button>
     <button class="tab" data-v="needs"><span class="tnum">04</span>Acceleration</button>
+    <button class="execbtn" id="execToggle" aria-pressed="false" title="Hide detail sections — headline view for stakeholders"><span class="sw"></span>Executive view</button>
   </nav>
 </header>
 
@@ -326,6 +341,14 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
     <div class="card kpi c-violet"><span class="label">Xente</span><span class="val" data-count="180">0</span><span class="meta">onboarded</span></div>
     <div class="card kpi c-indigo"><span class="label">Device Financing</span><span class="val" data-count="388">0</span><span class="meta">entrepreneurs linked</span></div>
     <div class="card kpi c-gold"><span class="label">Mkazi Shop e-commerce</span><span class="val" data-count="102">0</span><span class="meta">enterprises onboarded</span></div>
+  </div>
+
+  <div class="sec-label">Outcomes at a Glance</div>
+  <div class="grid g4">
+    <div class="card kpi c-green"><span class="label">Work Conditions Improved</span><span class="val" data-count="57.1" data-suf="%">0</span><span class="meta">1,435 of 2,513 assessed (YIW)</span></div>
+    <div class="card kpi c-gold"><span class="label">New Jobs Created</span><span class="val" data-count="153">0</span><span class="meta">from EOI employment records</span></div>
+    <div class="card kpi c-cyan"><span class="label">Increased Sales Reported</span><span class="val" data-count="275">0</span><span class="meta">accelerated MSMEs reporting growth</span></div>
+    <div class="card kpi c-teal"><span class="label">New Market Access</span><span class="val" data-count="413">0</span><span class="meta">MSMEs reached new markets</span></div>
   </div>
 
   <div class="sec-label">Who We Reached</div>
@@ -402,8 +425,8 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
     </div>
   </div>
 
-  <div class="sec-label">Inclusion Detail</div>
-  <div class="grid g2">
+  <div class="sec-label" data-tier="detail">Inclusion Detail</div>
+  <div class="grid g2" data-tier="detail">
     <div class="card">
       <h3><span class="ic">♿</span>Disability Type</h3>
       <div class="sub">156 persons with disability enrolled</div>
@@ -416,8 +439,8 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
     </div>
   </div>
 
-  <div class="sec-label">Livelihoods &amp; Digital Readiness</div>
-  <div class="grid g3">
+  <div class="sec-label" data-tier="detail">Livelihoods &amp; Digital Readiness</div>
+  <div class="grid g3" data-tier="detail">
     <div class="card">
       <h3><span class="ic">⛁</span>Business Sector</h3>
       <div class="sub">Trade &amp; services dominate</div>
@@ -441,7 +464,7 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
     </div>
   </div>
 
-  <div class="grid g2" style="margin-top:16px">
+  <div class="grid g2" style="margin-top:16px" data-tier="detail">
     <div class="card">
       <h3><span class="ic">▤</span>Smartphone Access</h3>
       <div class="sub">2,856 use a smartphone daily</div>
@@ -454,7 +477,7 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
     </div>
   </div>
 
-  <div class="note teal" style="margin-top:16px"><span class="ic">↯</span><div><b>Digital divide concentrated in Mary persona</b> — 4.5% report no smartphone access versus 2.2% for Atim. Persona-aware delivery matters for the lowest tier.</div></div>
+  <div class="note teal" style="margin-top:16px" data-tier="detail"><span class="ic">↯</span><div><b>Digital divide concentrated in Mary persona</b> — 4.5% report no smartphone access versus 2.2% for Atim. Persona-aware delivery matters for the lowest tier.</div></div>
 </section>
 
 <!-- ============ YIW ============ -->
@@ -490,7 +513,7 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
   </div>
 
   <div class="grid g3" style="margin-top:16px">
-    <div class="card">
+    <div class="card" data-tier="detail">
       <h3><span class="ic">⛁</span>Sector Mix</h3>
       <div class="sub">Trade &amp; services 93%</div>
       <div class="chart-wrap h260"><canvas id="ySector"></canvas></div>
@@ -502,7 +525,7 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
     </div>
   </div>
 
-  <div class="grid g2" style="margin-top:16px">
+  <div class="grid g2" style="margin-top:16px" data-tier="detail">
     <div class="card">
       <h3><span class="ic">✦</span>Improvement Outcomes</h3>
       <div class="sub">Among those who improved (n=1,390)</div>
@@ -516,13 +539,13 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
     </div>
   </div>
 
-  <div class="card span2" style="margin-top:16px">
+  <div class="card span2" style="margin-top:16px" data-tier="detail">
     <h3><span class="ic">▦</span>District Performance Matrix</h3>
     <div class="sub">Assessed volume, median income &amp; improvement rate</div>
     <table class="dt" id="yMatrix"></table>
   </div>
 
-  <div class="note teal" style="margin-top:16px"><span class="ic">⚖</span><div><b>The income–improvement paradox:</b> Kampala has the highest incomes but the lowest improvement rate (51.6%), while Light Manufacturing leads improvement at 81.7%. Higher baselines leave less room for measured gains.</div></div>
+  <div class="note teal" style="margin-top:16px" data-tier="detail"><span class="ic">⚖</span><div><b>The income–improvement paradox:</b> Kampala has the highest incomes but the lowest improvement rate (51.6%), while Light Manufacturing leads improvement at 81.7%. Higher baselines leave less room for measured gains.</div></div>
 </section>
 
 <!-- ============ EOI ============ -->
@@ -550,14 +573,14 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
       <div class="sub">Kampala 45% of 1,161 applicant records</div>
       <div class="chart-wrap h300"><canvas id="eGeo"></canvas></div>
     </div>
-    <div class="card">
+    <div class="card" data-tier="detail">
       <h3><span class="ic">⚥</span>Gender by District</h3>
       <div class="sub">Female-led across all districts</div>
       <div class="chart-wrap h300"><canvas id="eGender"></canvas></div>
     </div>
   </div>
 
-  <div class="grid g3" style="margin-top:16px">
+  <div class="grid g3" style="margin-top:16px" data-tier="detail">
     <div class="card span2">
       <h3><span class="ic">⚇</span>Age Distribution</h3>
       <div class="sub">Range 16–72 · 92% are youth</div>
@@ -577,14 +600,14 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
       <div class="vennwrap" id="eVenn"></div>
       <p class="vfoot">N = 1,161 applicant records · founder–employee overlap = 682 respondents (58.7%)</p>
     </div>
-    <div class="card">
+    <div class="card" data-tier="detail">
       <h3><span class="ic">₴</span>Income by Role</h3>
       <div class="sub">Median monthly salary (UGX)</div>
       <div class="chart-wrap h300"><canvas id="eRole"></canvas></div>
     </div>
   </div>
 
-  <div class="grid g2" style="margin-top:16px">
+  <div class="grid g2" style="margin-top:16px" data-tier="detail">
     <div class="card">
       <h3><span class="ic">▥</span>Income Distribution</h3>
       <div class="sub">52.5% earn below UGX 250K/month · median 250K</div>
@@ -597,7 +620,7 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
     </div>
   </div>
 
-  <div class="note" style="margin-top:16px"><span class="ic">⚐</span><div><b>83.3% are sole-founder micro-enterprises</b> — the "Mary" persona. This solopreneur structure shapes everything downstream: credit design, clinic content and formalization strategy.</div></div>
+  <div class="note" style="margin-top:16px" data-tier="detail"><span class="ic">⚐</span><div><b>83.3% are sole-founder micro-enterprises</b> — the "Mary" persona. This solopreneur structure shapes everything downstream: credit design, clinic content and formalization strategy.</div></div>
 </section>
 
 <!-- ============ NEEDS ============ -->
@@ -620,7 +643,7 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
     </div>
   </div>
 
-  <div class="grid g3" style="margin-top:16px">
+  <div class="grid g3" style="margin-top:16px" data-tier="detail">
     <div class="card span2">
       <h3><span class="ic">⌖</span>Coverage by District</h3>
       <div class="sub">Assessed entrepreneurs (n=563)</div>
@@ -633,7 +656,7 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
     </div>
   </div>
 
-  <div class="grid g2" style="margin-top:16px">
+  <div class="grid g2" style="margin-top:16px" data-tier="detail">
     <div class="card">
       <h3><span class="ic">⛉</span>Registration &amp; Formalization Intent</h3>
       <div class="sub">83% unregistered — but most are open to formalizing</div>
@@ -646,7 +669,7 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
     </div>
   </div>
 
-  <div class="grid g2" style="margin-top:16px">
+  <div class="grid g2" style="margin-top:16px" data-tier="detail">
     <div class="card">
       <h3><span class="ic">⛁</span>Financial-Management Practices</h3>
       <div class="sub">Mostly analogue record-keeping</div>
@@ -660,7 +683,7 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
     </div>
   </div>
 
-  <div class="grid g2" style="margin-top:16px">
+  <div class="grid g2" style="margin-top:16px" data-tier="detail">
     <div class="card">
       <h3><span class="ic">▤</span>Device Financing Demand</h3>
       <div class="sub">297 need a device (59%) · 6–12 month repayment</div>
@@ -674,7 +697,7 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
     </div>
   </div>
 
-  <div class="grid g2" style="margin-top:16px">
+  <div class="grid g2" style="margin-top:16px" data-tier="detail">
     <div class="card">
       <h3><span class="ic">⛒</span>Customer-Reach Channels</h3>
       <div class="sub">Channels are physical; digital marketplaces near-absent</div>
@@ -687,7 +710,7 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
     </div>
   </div>
 
-  <div class="grid g2" style="margin-top:16px">
+  <div class="grid g2" style="margin-top:16px" data-tier="detail">
     <div class="card">
       <h3><span class="ic">✦</span>Skills Needed to Improve Business</h3>
       <div class="sub">Feeds the business-clinic curriculum</div>
@@ -700,8 +723,8 @@ body.anim .vrow{opacity:0;animation:rise .55s cubic-bezier(.22,1,.36,1) both}
     </div>
   </div>
 
-  <div class="sec-label">Business Clinics · Apr–May 2026</div>
-  <div class="grid g2">
+  <div class="sec-label" data-tier="detail">Business Clinics · Apr–May 2026</div>
+  <div class="grid g2" data-tier="detail">
     <div class="card">
       <h3><span class="ic">⌂</span>Attendance by District</h3>
       <div class="sub">481 attended (96.2%) · 10 clinics conducted</div>
@@ -848,13 +871,24 @@ if(ANIM){
 
 /* ---------- TAB SWITCHING ---------- */
 const built={};
+let curView='overview';
 document.getElementById('tabs').addEventListener('click',e=>{
   const b=e.target.closest('.tab'); if(!b)return;
   const v=b.dataset.v;
+  curView=v;
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===b));
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id===v));
   window.scrollTo({top:0,behavior:'smooth'});
   if(built[v])replay(v);else build(v);
+});
+
+/* executive view: one switch collapses the dashboard to its headline layer */
+const execBtn=document.getElementById('execToggle');
+if(execBtn)execBtn.addEventListener('click',()=>{
+  const on=document.body.classList.toggle('exec');
+  execBtn.classList.toggle('on',on);
+  execBtn.setAttribute('aria-pressed',String(on));
+  if(built[curView])replay(curView);
 });
 
 /* replay all animations in a view: counters, card rises, charts & funnels */
