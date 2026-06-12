@@ -520,8 +520,17 @@ body.exec [data-tier="detail"]{display:none!important}
     </div>
     <div class="card span2">
       <h3><span class="ic">↗</span>Working Conditions Improved</h3>
-      <div class="sub">By district &amp; by sector (% improved)</div>
-      <div class="chart-wrap h260"><canvas id="yImproved"></canvas></div>
+      <div class="sub">Share of assessed youth reporting improved working conditions</div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap">
+        <div style="flex:1;min-width:230px">
+          <div class="sub" style="margin-bottom:6px;font-family:'JetBrains Mono';font-size:.68rem;letter-spacing:.1em;text-transform:uppercase">By District (%)</div>
+          <div class="chart-wrap h220"><canvas id="yImpDist"></canvas></div>
+        </div>
+        <div style="flex:1;min-width:230px">
+          <div class="sub" style="margin-bottom:6px;font-family:'JetBrains Mono';font-size:.68rem;letter-spacing:.1em;text-transform:uppercase">By Sector (%)</div>
+          <div class="chart-wrap h220"><canvas id="yImpSector"></canvas></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1155,14 +1164,10 @@ function bYiw(){
         y1:{position:'right',beginAtZero:true,grid:{display:false},border:{display:false},ticks:{callback:v=>v+'K'}}}}}));
   barV('yIncome',D.y.income.l,D.y.income.d,C.cyan,{bt:48});
   pie('ySector',D.y.sector.l,D.y.sector.d,[C.navy,C.green,C.gold]);
-  defer('yImproved',el=>new Chart(el,{type:'bar',
-    data:{labels:['Kampala','Mukono','Trade & Svc','Wakiso','Agriculture','Buikwe','Light Mfg'],
-      datasets:[{label:'% improved',
-        data:[51.6,57.2,56.0,63.8,65.7,60.1,81.7],
-        backgroundColor:['#1b4d7a','#1b4d7a',C.cyan,'#1b4d7a',C.teal,'#1b4d7a',C.green],borderRadius:5,maxBarThickness:30,...HOV}]},
-    options:{maintainAspectRatio:false,animation:POP,plugins:{legend:{display:false},
-      tooltip:{callbacks:{label:c=>c.parsed.y+'% improved'}}},
-      scales:{x:{...noGrid,ticks:{font:{size:10}}},y:{...yGrid,beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}}}));
+  const pctScale={plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y+'% improved'}}},
+    scales:{x:{...noGrid,ticks:{font:{size:11}}},y:{...yGrid,beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}}}};
+  barV('yImpDist',D.y.impDist.l,D.y.impDist.d,[C.teal,C.teal,C.teal,C.coral],{bt:42,o:pctScale});
+  barV('yImpSector',D.y.impSector.l,D.y.impSector.d,[C.green,C.teal,C.cyan],{bt:42,o:pctScale});
   barH('yOutcomes',D.y.outcomes.l,D.y.outcomes.d.map(v=>v),[C.green,C.cyan,C.gold,C.coral],{o:{scales:{x:{...yGrid,beginAtZero:true,max:100,ticks:{callback:v=>v+'%'}},y:{...noGrid}}}});
   barH('ySkills',D.y.skills.l,D.y.skills.d,C.gold);
   let m='<thead><tr><th>District</th><th class="num">Assessed</th><th class="num">Median Income</th><th class="num">% Improved</th></tr></thead><tbody>';
