@@ -144,7 +144,15 @@ main{max-width:1320px;margin:0 auto;padding:30px 26px 80px}
 .kpi .val .suf{font-size:1.1rem;color:var(--text-dim);font-weight:600;margin-left:3px}
 .kpi .meta{font-size:.76rem;color:var(--text-mute);margin-top:2px}
 .kpi .meta b{color:var(--green)}
-.kpi.c-cyan .val{color:var(--cyan)} .kpi.c-gold .val{color:var(--gold)}
+.kpi .incl{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+.kpi .incl .chip{display:inline-flex;align-items:baseline;gap:5px;font-size:.7rem;
+  padding:3px 9px;border-radius:7px;background:rgba(255,255,255,.03);border:1px solid var(--border)}
+.kpi .incl .chip b{font-family:'JetBrains Mono';font-size:.78rem;font-weight:700}
+.kpi .incl .chip.pwd b{color:var(--gold)}
+.kpi .incl .chip.ref b{color:var(--teal)}
+.kpi .incl .chip span{color:var(--text-mute)}
+.kpi .incl .chip.miss{background:rgba(224,120,86,.08);border-color:rgba(224,120,86,.3)}
+.kpi .incl .chip.miss span{color:var(--coral);font-weight:600}.kpi.c-cyan .val{color:var(--cyan)} .kpi.c-gold .val{color:var(--gold)}
 .kpi.c-teal .val{color:var(--teal)} .kpi.c-coral .val{color:var(--coral)}
 .kpi.c-indigo .val{color:var(--indigo)} .kpi.c-green .val{color:var(--green)}
 .kpi.c-violet .val{color:var(--violet)}
@@ -334,10 +342,10 @@ body.anim .jolt,.jolt{animation:jolt .55s cubic-bezier(.34,1.56,.64,1)!important
   </div>
 
   <div class="grid g4">
-    <a class="card kpi c-cyan" href="https://outboxafrica.sharepoint.com/:x:/r/sites/10XESOPartnerAdvantage/Shared Documents/B. Partners/Mkazipreneur/Mkazipreneur 10X Program Management/Deliverable 2/Foundation Course Enrollment Data/MKazipreneur Foundation Course Data Set 25-4-2026.xlsx?d=w32435afa322e45fa90ff39ea18b3586c&amp;csf=1&amp;web=1&amp;e=qn1k67" target="_blank" rel="noopener" title="View source data on SharePoint (organization access required)"><span class="label">Foundation Enrolled (WEO)</span><span class="val" data-count="3160">0</span><span class="meta">across 4 districts · target reached Mar 2026</span></a>
-    <a class="card kpi c-teal" href="https://outboxafrica.sharepoint.com/:x:/r/sites/10XESOPartnerAdvantage/Shared Documents/B. Partners/Mkazipreneur/Mkazipreneur 10X Program Management/Deliverable 2/YIW/MKazipreneur YIW 1-06-2026.xlsx?d=w15648dcee866472091c6910d21c5bd06&amp;csf=1&amp;web=1&amp;e=KjKZuA" target="_blank" rel="noopener" title="View source data on SharePoint (organization access required)"><span class="label">Youth-in-Work Assessed</span><span class="val" data-count="2513">0</span><span class="meta"><b>99%</b> earned income · target 2,500</span></a>
-    <a class="card kpi c-gold" href="https://outboxafrica.sharepoint.com/:x:/r/sites/10XESOPartnerAdvantage/Shared Documents/B. Partners/Mkazipreneur/Mkazipreneur 10X Program Management/Deliverable 2/Needs Assessment/MKazipreneur Needs Assessment 25-5-2025.xlsx?d=wcc54da634a254662ac17d12423e092ac&amp;csf=1&amp;web=1&amp;e=e7RT1u" target="_blank" rel="noopener" title="View source data on SharePoint (organization access required)"><span class="label">MSMEs Selected</span><span class="val" data-count="500">0</span><span class="meta">from 563 assessed · due diligence complete</span></a>
-    <a class="card kpi c-green" href="https://outboxafrica.sharepoint.com/:x:/r/sites/10XESOPartnerAdvantage/Shared Documents/B. Partners/Mkazipreneur/Mkazipreneur 10X Program Management/Deliverable 2/Needs Assessment/MKazipreneur Needs Assessment 25-5-2025.xlsx?d=wcc54da634a254662ac17d12423e092ac&amp;csf=1&amp;web=1&amp;e=e7RT1u" target="_blank" rel="noopener" title="View source data on SharePoint (organization access required)"><span class="label">Business-Clinic Attendance</span><span class="val" data-count="96" data-suf="%">0</span><span class="meta">481 of 500 selected MSMEs</span></a>
+    <a class="card kpi c-cyan" href="https://outboxafrica.sharepoint.com/:x:/r/sites/10XESOPartnerAdvantage/Shared Documents/B. Partners/Mkazipreneur/Mkazipreneur 10X Program Management/Deliverable 2/Foundation Course Enrollment Data/MKazipreneur Foundation Course Data Set 25-4-2026.xlsx?d=w32435afa322e45fa90ff39ea18b3586c&amp;csf=1&amp;web=1&amp;e=qn1k67" target="_blank" rel="noopener" title="View source data on SharePoint (organization access required)"><span class="label">Foundation Course / WEO</span><span class="val" data-count="3160">0</span><span class="meta">enrolled · target reached Mar 2026</span><span class="incl"><span class="chip pwd"><b>156</b><span>PWD · 5%</span></span><span class="chip ref"><b>146</b><span>Refugee · 4.6%</span></span></span></a>
+    <a class="card kpi c-violet" href="https://outboxafrica.sharepoint.com/:x:/r/sites/10XESOPartnerAdvantage/Shared Documents/B. Partners/Mkazipreneur/Mkazipreneur 10X Program Management/Deliverable 2/EOI Data/MKaziprenuer EOI 11-5-26.xlsx?d=wcfaf0de751204aaeba7b006f0825d547&amp;csf=1&amp;web=1&amp;e=7B25sX" target="_blank" rel="noopener" title="View source data on SharePoint (organization access required)"><span class="label">Expression of Interest</span><span class="val" data-count="874">0</span><span class="meta">MSMEs · 1,161 applicant records</span><span class="incl"><span class="chip pwd"><b>58</b><span>PWD · 5.0%</span></span><span class="chip ref"><b>46</b><span>Refugee · 3.96%</span></span></span></a>
+    <a class="card kpi c-teal" href="https://outboxafrica.sharepoint.com/:x:/r/sites/10XESOPartnerAdvantage/Shared Documents/B. Partners/Mkazipreneur/Mkazipreneur 10X Program Management/Deliverable 2/YIW/MKazipreneur YIW 1-06-2026.xlsx?d=w15648dcee866472091c6910d21c5bd06&amp;csf=1&amp;web=1&amp;e=KjKZuA" target="_blank" rel="noopener" title="View source data on SharePoint (organization access required)"><span class="label">Youth in Work</span><span class="val" data-count="2513">0</span><span class="meta">assessed · <b>99%</b> earned income</span><span class="incl"><span class="chip pwd"><b>124</b><span>PWD · 5%</span></span><span class="chip ref"><b>93</b><span>Refugee · 4%</span></span></span></a>
+    <a class="card kpi c-gold" href="https://outboxafrica.sharepoint.com/:x:/r/sites/10XESOPartnerAdvantage/Shared Documents/B. Partners/Mkazipreneur/Mkazipreneur 10X Program Management/Deliverable 2/Needs Assessment/MKazipreneur Needs Assessment 25-5-2025.xlsx?d=wcc54da634a254662ac17d12423e092ac&amp;csf=1&amp;web=1&amp;e=e7RT1u" target="_blank" rel="noopener" title="View source data on SharePoint (organization access required)"><span class="label">Accelerated MSMEs</span><span class="val" data-count="500">0</span><span class="meta">selected from 563 assessed</span><span class="incl"><span class="chip pwd miss"><b>15</b><span>PWD · 2.2%</span></span><span class="chip ref"><b>16</b><span>Refugee · 3.2%</span></span></span></a>
   </div>
 
   <div class="sec-label">The Program Journey</div>
@@ -523,6 +531,19 @@ body.anim .jolt,.jolt{animation:jolt .55s cubic-bezier(.34,1.56,.64,1)!important
     <span><b style="color:var(--text-dim)">New Jobs Created:</b> figures based on employment records from EOI data. Full survey needed for clearer outlook.</span>
   </p>
 
+  <div class="card" style="margin-top:16px">
+    <h3><span class="ic">♿</span>Inclusion Breakdown by District</h3>
+    <div class="sub">Assessed youth, PWDs &amp; refugees across the four districts (n=2,513)</div>
+    <div style="display:flex;gap:22px;flex-wrap:wrap;align-items:center">
+      <div style="flex:1;min-width:280px">
+        <div class="chart-wrap h260"><canvas id="yIncl"></canvas></div>
+      </div>
+      <div style="flex:1;min-width:300px">
+        <table class="dt" id="yInclTable"></table>
+      </div>
+    </div>
+  </div>
+
   <div class="grid g2" style="margin-top:16px">
     <div class="card">
       <h3><span class="ic">⌖</span>Participants by District</h3>
@@ -670,9 +691,10 @@ body.anim .jolt,.jolt{animation:jolt .55s cubic-bezier(.34,1.56,.64,1)!important
       <div class="sub">From outreach to high-touch accelerator support</div>
       <div class="afunnel" id="accFunnel"></div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:16px">
+    <div style="display:flex;flex-direction:column;gap:14px">
       <div class="card kpi c-green" style="flex:1"><span class="label">Clinic Attendance</span><span class="val" data-count="96" data-suf="%">0</span><span class="meta">481 of 500 · 10 clinics conducted</span></div>
-      <div class="card kpi c-coral" style="flex:1"><span class="label">Median Loan Needed</span><span class="val">2.5<span class="suf">M</span></span><span class="meta">UGX · aggregate demand 2.4B</span></div>
+      <div class="card kpi c-gold" style="flex:1"><span class="label">PWD-owned MSMEs Selected</span><span class="val" data-count="15">0</span><span class="meta"><b style="color:var(--coral)">2.2% · quota not met</b> (5% target)</span></div>
+      <div class="card kpi c-teal" style="flex:1"><span class="label">Refugee-owned MSMEs Selected</span><span class="val" data-count="16">0</span><span class="meta">3.2% of selected MSMEs</span></div>
     </div>
   </div>
 
@@ -1008,7 +1030,9 @@ const D={
    impSector:{l:['Light Mfg','Agriculture','Trade & Svc'],d:[81.7,65.7,56.0]},
    outcomes:{l:['Higher income','Sense of purpose','Respect at workplace','Good reputation'],d:[80,41,18,17]},
    skills:{l:['Financial literacy','Digital marketing','Online marketing','Saving','Digital literacy','Staying safe online','Record keeping','Marketing','Digital skills','Financial basics'],d:[158,106,78,53,46,43,43,42,41,39]},
-   matrix:[['Kampala',897,'240K','51.6%'],['Mukono',710,'200K','57.2%'],['Wakiso',580,'230K','63.8%'],['Buikwe',326,'140K','60.1%']]
+   matrix:[['Kampala',897,'240K','51.6%'],['Mukono',710,'200K','57.2%'],['Wakiso',580,'230K','63.8%'],['Buikwe',326,'140K','60.1%']],
+   incl:{l:['Kampala','Wakiso','Mukono','Buikwe'],all:[897,580,710,326],pwd:[48,40,21,15],ref:[79,7,3,4],
+     rows:[['Kampala',897,'36%',48,'5.4%',79,'8.8%'],['Wakiso',580,'23%',40,'6.9%',7,'1.2%'],['Mukono',710,'28%',21,'3.0%',3,'0.4%'],['Buikwe',326,'13%',15,'4.6%',4,'1.2%']]}
  },
  e:{
    geo:{l:['Kampala','Wakiso','Mukono','Buikwe'],d:[524,316,232,89]},
@@ -1215,6 +1239,19 @@ function bYiw(){
   D.y.matrix.forEach(r=>m+=`<tr><td>${r[0]}</td><td class="num">${k(r[1])}</td><td class="num">${r[2]}</td><td class="num">${r[3]}</td></tr>`);
   m+='<tr class="total"><td>Total</td><td class="num">2,513</td><td class="num">200K</td><td class="num">57.1%</td></tr></tbody>';
   document.getElementById('yMatrix').innerHTML=m;
+
+  // inclusion: grouped chart (PWD & refugee counts by district) + full table
+  defer('yIncl',el=>new Chart(el,{type:'bar',
+    data:{labels:D.y.incl.l,datasets:[
+      {label:'PWDs',data:D.y.incl.pwd,backgroundColor:C.gold,borderRadius:5,...HOV},
+      {label:'Refugees',data:D.y.incl.ref,backgroundColor:C.teal,borderRadius:5,...HOV}
+    ]},
+    options:{maintainAspectRatio:false,animation:POP,plugins:{legend:{position:'top'}},
+      scales:{x:{...noGrid},y:{...yGrid,beginAtZero:true}}}}));
+  let it='<thead><tr><th>District</th><th class="num">All</th><th class="num">PWDs</th><th class="num">%</th><th class="num">Refugees</th><th class="num">%</th></tr></thead><tbody>';
+  D.y.incl.rows.forEach(r=>it+=`<tr><td>${r[0]}</td><td class="num">${k(r[1])} <span style="color:var(--text-mute)">(${r[2]})</span></td><td class="num">${r[3]}</td><td class="num">${r[4]}</td><td class="num">${r[5]}</td><td class="num">${r[6]}</td></tr>`);
+  it+='<tr class="total"><td>Total</td><td class="num">2,513</td><td class="num">124</td><td class="num">5%</td><td class="num">93</td><td class="num">4%</td></tr></tbody>';
+  document.getElementById('yInclTable').innerHTML=it;
 }
 
 function bEoi(){
